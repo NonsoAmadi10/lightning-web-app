@@ -18,6 +18,8 @@ func GenerateLNURL(c echo.Context) error {
 	callbackURL := c.QueryParam("callbackURL")
 	tag := c.QueryParam("tag")
 
+	//TODO: create constant k1 and save to a db, that constant has to be unique and would be used everytime I need to create a new lnurl
+
 	// Validate minAmount, maxAmount and callbackURL here
 
 	// Generate unique LNURL
