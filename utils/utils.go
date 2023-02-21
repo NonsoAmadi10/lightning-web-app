@@ -15,6 +15,12 @@ type SuccessResponse struct {
 	Data    interface{} `json:"data"`
 }
 
+type LNPay struct {
+	Routes        []string          `json:"routes"`
+	Pr            string            `json:"pr"`
+	SuccessAction map[string]string `json:"success_action"`
+}
+
 func GetEnv(key string) string {
 	// load .env file
 	err := godotenv.Load(".env")

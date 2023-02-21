@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/NonsoAmadi10/lightning-web-app/config"
+	"github.com/NonsoAmadi10/lightning-web-app/lnurl"
 	"github.com/NonsoAmadi10/lightning-web-app/models"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/joho/godotenv/autoload"
@@ -35,8 +36,15 @@ func App() *echo.Echo {
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 
+	api := e.Group("/api/v1")
+
+	api.GET("/get-lnurl", lnurl.GenerateLNURL)
+	api.GET("/u", lnurl.GetLNParams)
+	api.GET("/decoded", lnurl.Decode)
+	api.GET("/u/:identifier", lnurl.GetLNPay)
+
 	// Initialize DB
-	config.SetupDB(&models.LNEntity{})
+	config.SetupDB(&models.LNEntity{}, &models.LNInvoice{})
 
 	return e
 
