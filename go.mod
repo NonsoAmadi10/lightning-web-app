@@ -3,10 +3,13 @@ module github.com/NonsoAmadi10/lightning-web-app
 go 1.19
 
 require (
-	github.com/labstack/echo/v4 v4.10.0
+	github.com/joho/godotenv v1.5.1
+	github.com/labstack/echo/v4 v4.10.1
 	github.com/lncm/lnd-rpc v1.0.2
 	google.golang.org/grpc v1.38.0
 	gopkg.in/macaroon.v2 v2.1.0
+	gorm.io/driver/postgres v1.4.8
+	gorm.io/gorm v1.24.5
 )
 
 require (
@@ -30,7 +33,16 @@ require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/decred/dcrd/lru v1.0.0 // indirect
 	github.com/go-errors/errors v1.0.1 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/pgx/v5 v5.3.0 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kkdai/bstream v1.0.0 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lightninglabs/gozmq v0.0.0-20191113021534-d20a764486bf // indirect
 	github.com/lightninglabs/neutrino v0.14.2 // indirect
 	github.com/lightningnetwork/lnd v0.15.0-beta // indirect
@@ -44,25 +56,23 @@ require (
 	github.com/tidwall/gjson v1.6.1 // indirect
 	github.com/tidwall/match v1.0.1 // indirect
 	github.com/tidwall/pretty v1.0.2 // indirect
-	golang.org/x/term v0.4.0 // indirect
+	golang.org/x/term v0.5.0 // indirect
+	golang.org/x/time v0.3.0 // indirect
 )
 
 require (
 	github.com/fiatjaf/go-lnurl v1.12.0
-	github.com/frankban/quicktest v1.2.2 // indirect
+	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-cmp v0.5.6 // indirect
-	github.com/kr/pretty v0.2.1 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	golang.org/x/crypto v0.2.0 // indirect
-	golang.org/x/net v0.5.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/crypto v0.6.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/genproto v0.0.0-20210617175327-b9e0b3197ced // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
