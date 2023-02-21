@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/NonsoAmadi10/lightning-web-app/config"
-
+	"github.com/NonsoAmadi10/lightning-web-app/models"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
@@ -36,7 +36,7 @@ func App() *echo.Echo {
 	}))
 
 	// Initialize DB
-	config.SetupDB()
+	config.SetupDB(&models.LNEntity{})
 
 	return e
 

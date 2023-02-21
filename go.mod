@@ -3,6 +3,7 @@ module github.com/NonsoAmadi10/lightning-web-app
 go 1.19
 
 require (
+	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.10.1
 	github.com/lncm/lnd-rpc v1.0.2
