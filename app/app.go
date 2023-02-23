@@ -38,10 +38,13 @@ func App() *echo.Echo {
 
 	api := e.Group("/api/v1")
 
-	api.GET("/get-lnurl", lnurl.GenerateLNURL)
+	api.GET("/payment-link", lnurl.GenerateLNURL)
 	api.GET("/u", lnurl.GetLNParams)
 	api.GET("/decoded", lnurl.Decode)
 	api.GET("/u/:identifier", lnurl.GetLNPay)
+	api.GET("/withdraw-link", lnurl.GetWURL)
+	api.GET("/lnwithdraw/:identifier", lnurl.GetWParams)
+	api.GET("/withdraw/callback", lnurl.LNWithdrawPay)
 
 	// Initialize DB
 	config.SetupDB(&models.LNEntity{}, &models.LNInvoice{})

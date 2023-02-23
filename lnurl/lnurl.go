@@ -97,3 +97,65 @@ func GetLNPay(c echo.Context) error {
 
 	return c.JSONPretty(http.StatusOK, response, "")
 }
+
+func GetWURL(c echo.Context) error {
+	request, err := GetLNWithdraw()
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	response := &utils.SuccessResponse{
+		Message: "Here is your withdraw request",
+		Data: map[string]string{
+			"lnurl": request,
+		},
+	}
+
+	return c.JSONPretty(http.StatusOK, response, "")
+}
+
+func GetWParams(c echo.Context) error {
+	identifier := c.Param("identifier")
+
+	amount := 1000
+
+	params, err := GetLNW(amount, identifier)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	response := &utils.SuccessResponse{
+		Data: params,
+	}
+
+	return c.JSONPretty(http.StatusOK, response, "")
+}
+
+func LNWithdrawPay(c echo.Context) error {
+
+	k1 := c.QueryParam("k1")
+	payReq := c.QueryParam("pr")
+
+	if k1 == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "k1 is required")
+	}
+
+	if payReq == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "pr is required")
+	}
+
+	paymentSuccess, err := ProcessLNW(k1, payReq)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	response := &utils.SuccessResponse{
+		Data:    paymentSuccess,
+		Message: "OK",
+	}
+
+	return c.JSONPretty(http.StatusOK, response, "")
+}

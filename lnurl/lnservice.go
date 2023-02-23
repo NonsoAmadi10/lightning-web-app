@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/NonsoAmadi10/lightning-web-app/config"
 	"github.com/NonsoAmadi10/lightning-web-app/models"
@@ -141,7 +142,7 @@ func GetLNWithdraw() (string, error) {
 	}
 
 	if err := config.DB.Create(&ln).Error; err != nil {
-		return "", errors.New("Error saving to database")
+		return "", errors.New("error saving to database")
 	}
 
 	return encoded, nil
@@ -170,12 +171,80 @@ func GetLNW(amount int, identifier string) (*LN.LNURLWithdrawResponse, error) {
 
 	id.K1 = k1
 	id.Description = "A Withdraw Request"
-	id.SatMaxWithdrawable = int(request.MaxWithdrawable)
-	id.SatMinWithdrawable = int(request.MinWithdrawable)
+	id.SatMaxWithdrawable = int(amount)
+	id.SatMinWithdrawable = int(amount)
 
 	// update parameters
 	config.DB.Save(&id)
+	fmt.Println(id.SatMaxWithdrawable)
+	fmt.Println(id.SatMinWithdrawable)
 
 	return request, nil
 
+}
+
+func ProcessLNW(k1 string, pr string) (string, error) {
+	// check if k1 exist
+
+	var k models.LNEntity
+
+	result := config.DB.Where("k1 = ?", k1).First(&k)
+
+	// if err := config.DB.First(&k, "k1 = ?", k).RowsAffected; err < 0 {
+	// 	return "", errors.New("request not recognized")
+	// }
+
+	if result.Error != nil {
+		return "", errors.New("request not recognized")
+	}
+
+	client := config.Config()
+	// decode the pay request
+	payReq := &lnrpc.PayReqString{
+		PayReq: pr,
+	}
+
+	decodeReq, err := client.DecodePayReq(context.Background(), payReq)
+
+	if err != nil {
+		return "", errors.New("error decoding request")
+	}
+
+	// get amount of satoshi
+	amount := decodeReq.NumSatoshis
+
+	// check to see if the amount in the decoded pay request exceeds the satMinWithdrawable
+
+	if int(amount) > k.SatMaxWithdrawable {
+		return "", errors.New("payment request exceeds the maximum withdrawable satoshis")
+	}
+
+	if int(amount) < k.SatMinWithdrawable {
+		return "", errors.New("payment request is lesser the maximum withdrawable satoshis")
+	}
+
+	// if all conditions pass, pay the invoice
+	payment := &lnrpc.SendRequest{
+		PaymentRequest: pr,
+	}
+
+	withdrawSuccess, err := client.SendPaymentSync(context.Background(), payment)
+
+	if withdrawSuccess.PaymentError != "" {
+		log.Println(err.Error())
+		return "", errors.New("expired or paid invoice")
+	}
+
+	// save invoice in the database as settled
+	paidInvoice := models.LNInvoice{
+		PaymentID: k.ID,
+		Pr:        pr,
+		Status:    "settled",
+	}
+
+	if err := config.DB.Create(&paidInvoice).Error; err != nil {
+		return "", errors.New("error saving to database")
+	}
+
+	return "Payment success", nil
 }
