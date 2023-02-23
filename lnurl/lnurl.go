@@ -68,14 +68,16 @@ func Decode(c echo.Context) error {
 }
 
 func GetLNPay(c echo.Context) error {
-
+	var amount int64
 	identifier := c.Param("identifier")
-	amount, err := strconv.Atoi(c.QueryParam("amount"))
+	amt, err := strconv.Atoi(c.QueryParam("amount"))
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "amount must be an integer")
 	}
 	description := c.QueryParam("desc")
+
+	amount = int64(amt)
 
 	// generate lnpay
 
@@ -95,23 +97,3 @@ func GetLNPay(c echo.Context) error {
 
 	return c.JSONPretty(http.StatusOK, response, "")
 }
-
-// func GetAddress(c echo.Context) error {
-
-// 	client := config.Config()
-
-// 	addressType := lnrpc.AddressType_NESTED_PUBKEY_HASH
-
-// 	request := &lnrpc.NewAddressRequest{
-// 		Type: addressType,
-// 	}
-
-// 	addr, err := client.NewAddress(context.Background(), request)
-
-// 	if err != nil {
-// 		fmt.Printf("Failed to create new address: %v", err)
-// 		return c.JSONPretty(http.StatusInternalServerError, "", "")
-// 	}
-
-// 	return c.JSONPretty(http.StatusCreated, &AddressResponse{Addr: addr.Address}, "")
-// }

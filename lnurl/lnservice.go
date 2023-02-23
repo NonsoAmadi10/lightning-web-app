@@ -80,7 +80,7 @@ func DecodeLNURL(lnurl string) (string, error) {
 	return decoded, nil
 }
 
-func GenPaymentRequest(amount int, identifier string, description string) (string, error) {
+func GenPaymentRequest(amount int64, identifier string, description string) (string, error) {
 	// check if the identifier is a known payment link
 	var id models.LNEntity
 
@@ -88,13 +88,15 @@ func GenPaymentRequest(amount int, identifier string, description string) (strin
 		return "", errors.New("identifier does not exist")
 	}
 
+	//check if amount is within the minimum and maximum spendable limit
+
 	//if it exists, generate a payment invoice
 
 	client := config.Config()
 
 	invoice := &lnrpc.Invoice{
 		Memo:   description,
-		Value:  int64(amount),
+		Value:  amount,
 		Expiry: 3600,
 	}
 
@@ -114,5 +116,66 @@ func GenPaymentRequest(amount int, identifier string, description string) (strin
 		return "", fmt.Errorf("an error occured creating a payment request %v", err.Error())
 	}
 	return paymentRequest.PaymentRequest, nil
+
+}
+
+func GetLNWithdraw() (string, error) {
+
+	id := utils.RandomString(4)
+	url := fmt.Sprintf("http://localhost:4000/api/v1/lnwithdraw/%v", id)
+
+	// genrate lnurl
+
+	encoded, err := LN.LNURLEncode(url)
+
+	if err != nil {
+		return "", errors.New("error occured generating the lnurl")
+	}
+
+	// create ln entity
+	ln := models.LNEntity{
+
+		LnurlTag:   "withdrawRequest",
+		Url:        url,
+		Identifier: id,
+	}
+
+	if err := config.DB.Create(&ln).Error; err != nil {
+		return "", errors.New("Error saving to database")
+	}
+
+	return encoded, nil
+
+}
+
+func GetLNW(amount int, identifier string) (*LN.LNURLWithdrawResponse, error) {
+	// check if identifier exists
+	var id models.LNEntity
+
+	if err := config.DB.First(&id, "identifier = ?", identifier).RowsAffected; err < 0 {
+		return &LN.LNURLWithdrawResponse{}, errors.New("identifier does not exist")
+	}
+
+	// generate k1
+	k1 := utils.RandomString(6)
+
+	request := &LN.LNURLWithdrawResponse{
+		Tag:                "withdrawRequest",
+		Callback:           "http://localhost:4000/api/v1/withdraw/callback",
+		K1:                 k1,
+		MaxWithdrawable:    int64(amount),
+		MinWithdrawable:    int64(amount),
+		DefaultDescription: "A withdraw Request",
+	}
+
+	id.K1 = k1
+	id.Description = "A Withdraw Request"
+	id.SatMaxWithdrawable = int(request.MaxWithdrawable)
+	id.SatMinWithdrawable = int(request.MinWithdrawable)
+
+	// update parameters
+	config.DB.Save(&id)
+
+	return request, nil
 
 }
