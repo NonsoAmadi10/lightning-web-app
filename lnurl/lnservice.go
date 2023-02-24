@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/NonsoAmadi10/lightning-web-app/config"
 	"github.com/NonsoAmadi10/lightning-web-app/models"
 	"github.com/NonsoAmadi10/lightning-web-app/utils"
 	LN "github.com/fiatjaf/go-lnurl"
 	"github.com/lncm/lnd-rpc/v0.10.0/lnrpc"
+	"gorm.io/gorm"
 )
 
 func GenerateURL(params LNStruct) string {
@@ -184,18 +184,16 @@ func GetLNW(amount int, identifier string) (*LN.LNURLWithdrawResponse, error) {
 }
 
 func ProcessLNW(k1 string, pr string) (string, error) {
-	// check if k1 exist
 
 	var k models.LNEntity
 
 	result := config.DB.Where("k1 = ?", k1).First(&k)
 
-	// if err := config.DB.First(&k, "k1 = ?", k).RowsAffected; err < 0 {
-	// 	return "", errors.New("request not recognized")
-	// }
-
 	if result.Error != nil {
-		return "", errors.New("request not recognized")
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return "", nil
+		}
+		return "", result.Error
 	}
 
 	client := config.Config()
@@ -228,13 +226,14 @@ func ProcessLNW(k1 string, pr string) (string, error) {
 		PaymentRequest: pr,
 	}
 
-	withdrawSuccess, err := client.SendPaymentSync(context.Background(), payment)
+	withdrawSuccess, _ := client.SendPaymentSync(context.Background(), payment)
 
 	if withdrawSuccess.PaymentError != "" {
-		log.Println(err.Error())
+
 		return "", errors.New("expired or paid invoice")
 	}
 
+	fmt.Println(withdrawSuccess.PaymentError)
 	// save invoice in the database as settled
 	paidInvoice := models.LNInvoice{
 		PaymentID: k.ID,
@@ -246,5 +245,18 @@ func ProcessLNW(k1 string, pr string) (string, error) {
 		return "", errors.New("error saving to database")
 	}
 
-	return "Payment success", nil
+	return "Payment Request", nil
+}
+
+func GetInvoice(pr string) (models.LNInvoice, error) {
+
+	var invoice models.LNInvoice
+
+	result := config.DB.Where("pr = ?", pr).First(&invoice).Preload("PaymentID")
+
+	if result.Error != nil {
+		return models.LNInvoice{}, errors.New("request not recognized")
+	}
+
+	return invoice, nil
 }

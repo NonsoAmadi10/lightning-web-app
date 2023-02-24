@@ -1,6 +1,7 @@
 package lnurl
 
 import (
+	"fmt"
 	"net/http"
 
 	"strconv"
@@ -148,12 +149,31 @@ func LNWithdrawPay(c echo.Context) error {
 
 	paymentSuccess, err := ProcessLNW(k1, payReq)
 
+	fmt.Println(paymentSuccess)
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	response := &utils.SuccessResponse{
 		Data:    paymentSuccess,
+		Message: "OK",
+	}
+
+	return c.JSONPretty(http.StatusOK, response, "")
+}
+
+func GetInvoiceByPR(c echo.Context) error {
+	pr := c.QueryParam("pr")
+
+	invoice, err := GetInvoice(pr)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	response := &utils.SuccessResponse{
+		Data:    invoice,
 		Message: "OK",
 	}
 

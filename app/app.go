@@ -45,6 +45,7 @@ func App() *echo.Echo {
 	api.GET("/withdraw-link", lnurl.GetWURL)
 	api.GET("/lnwithdraw/:identifier", lnurl.GetWParams)
 	api.GET("/withdraw/callback", lnurl.LNWithdrawPay)
+	api.GET("/invoice", lnurl.GetInvoiceByPR)
 
 	// Initialize DB
 	config.SetupDB(&models.LNEntity{}, &models.LNInvoice{})
