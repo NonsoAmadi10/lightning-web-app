@@ -1,17 +1,7 @@
 # LOMO
 
-Lomo(lightning money) is a payment app that allows users to make payments using their lightning url (lnurl), and enables them to withdraw(cash back) from the app to any LN wallet. It will be built using the golang lnrpc library.
+Lomo(lightning money) is a payment app that allows businesses to offer cash back to their users whenever they make a purchase from their store. It uses LNURL-Withdraw to make this possible and it requires users to possess an LN Wallet. It will be built using the golang lnrpc library.
 
-Users can be individuals, businesses, shops, or online vendors. The app will enable users to generate LN URL, and track payments made to that url.
-
-
-### Functionalities
-
-Generate LN URL for user customers..
-Notify and update user balance after an invoice is paid.
-Enable users to withdraw their balance to any LN wallet using their LN url.
-Enable users to view their transaction history for paid payments and withdrawals.
-Authenticate, authorize, and identify users.
 
 ### Goals:
 
